@@ -1,3 +1,5 @@
+
+
 # Tickets Backend
 
 API REST para la gestión de tickets de soporte con clasificación automática, comentarios, actualización de estado y persistencia en PostgreSQL.
