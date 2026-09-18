@@ -1,0 +1,25 @@
+# Etapa 1: Compilación con Gradle
+FROM eclipse-temurin:17-jdk-alpine AS build
+WORKDIR /app
+
+# Copiar archivos de Gradle para aprovechar la caché de capas
+COPY gradlew .
+COPY gradle ./gradle
+COPY build.gradle .
+COPY settings.gradle .
+
+# Dar permisos de ejecución a gradlew
+RUN chmod +x gradlew
+
+# Copiar el código fuente y compilar omitiendo los tests para acelerar la construcción
+COPY src ./src
+RUN ./gradlew bootJar --no-daemon -x test
+
+# Etapa 2: Imagen final ligera para ejecución
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+
+COPY --from=build /app/build/libs/*.jar app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
